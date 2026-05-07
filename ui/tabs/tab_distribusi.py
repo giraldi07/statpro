@@ -53,16 +53,16 @@ class TabDistribusi:
 
         self._draw_header()
 
-        # Rumus note
+        # Rumus note (Disesuaikan agar mencakup i dan n)
         note = ctk.CTkFrame(self._tab, fg_color=C["bg_card2"], corner_radius=8)
         note.pack(fill="x", pady=(8, 0))
         ctk.CTkLabel(
             note,
             text=(
-                "Rumus:  k = 1 + 3.322·log₁₀(n) [Sturges]  ·  c = ⌈Range / k⌉  ·  "
+                "Rumus:  k = ⌈1 + 3.322·log₁₀(n)⌉ [Sturges]  ·  c = Range / k  ·  "
                 "x̄ = Σ(fᵢ·xᵢ) / n  ·  "
-                "Me = Lme + [(n/2 − F₋) / fme]·c  ·  "
-                "Mo = Lmo + [d₁ / (d₁+d₂)]·c"
+                "Qᵢ = Tb + [( (i·n/4) − F₋ ) / fq]·c  ·  "
+                "Mo = Tb + [d₁ / (d₁+d₂)]·c"
             ),
             font=F(9),
             text_color=C["text_muted"],
@@ -101,20 +101,29 @@ class TabDistribusi:
             if info and int(info["row"]) > 0:
                 w.destroy()
 
-        mean = stats["mean"]
+        # Sinkronisasi dengan key baru dari statistics.py
+        mean_grouped = stats["mean_grouped"]
         n = stats["n"]
-        max_f = max(cls["f"] for cls in classes)
+        
+        # Ambil max frekuensi untuk highlight modus
+        all_f = [cls["f"] for cls in classes]
+        max_f = max(all_f) if all_f else 0
+        
         total_f = total_fx = total_fdev2 = 0.0
 
         for i, cls in enumerate(classes):
             row = i + 1
-            fdev2 = cls["f"] * (cls["mid"] - mean) ** 2
-            total_f    += cls["f"]
-            total_fx   += cls["fx"]
+            # Perhitungan deviasi menggunakan mean_grouped
+            fdev2 = cls["f"] * (cls["mid"] - mean_grouped) ** 2
+            
+            total_f     += cls["f"]
+            total_fx    += cls["fx"]
             total_fdev2 += fdev2
-            f_rel = cls["f"] / n * 100
+            f_rel = (cls["f"] / n * 100) if n > 0 else 0
 
-            bracket  = ")" if i < len(classes) - 1 else "]"
+            # Penentuan kurung interval (inklusif vs eksklusif)
+            # Sesuai logika np.histogram: semua bin [a, b) kecuali bin terakhir [a, b]
+            bracket = "]" if i == len(classes) - 1 else ")"
             interval = f"[{cls['lower']:.2f}, {cls['upper']:.2f}{bracket}"
 
             cells = [
@@ -127,12 +136,16 @@ class TabDistribusi:
                 f"{cls['fx']:.4f}",
                 f"{fdev2:.4f}",
             ]
+            
             bg = C["table_even"] if i % 2 == 0 else C["table_odd"]
-            is_mode = cls["f"] == max_f
+            is_mode = cls["f"] == max_f and max_f > 0
 
             for j, val in enumerate(cells):
-                fw    = "bold" if j == 3 else "normal"
+                # Kolom Frekuensi (index 3) diberi tebal
+                fw = "bold" if j == 3 else "normal"
+                # Warna khusus untuk baris modus
                 color = C["accent4"] if (j == 3 and is_mode) else C["text_primary"]
+                
                 ctk.CTkLabel(
                     self._tbl,
                     text=val,
@@ -165,11 +178,11 @@ class TabDistribusi:
                 padx=6,
             ).grid(row=total_row, column=j, sticky="nsew", padx=1, pady=1)
 
-        # Update banner
+        # Update banner info sesuai key baru
         self._banner_lbl.configure(
             text=(
                 f"📊  Kolom: {col_name}  ·  n = {stats['n']}  ·  "
-                f"k = {stats['k']} kelas  ·  c = {stats['c']}  ·  "
+                f"k = {stats['k']} kelas  ·  c = {stats['c']:.4f}  ·  "
                 f"Range = {stats['range']:.4f}"
             ),
             text_color=C["accent3"],

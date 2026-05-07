@@ -76,7 +76,7 @@ class Sidebar(ctk.CTkFrame):
     def _build_metrics(self) -> None:
         ctk.CTkLabel(
             self,
-            text="RINGKASAN STATISTIK",
+            text="RINGKASAN STATISTIK (KELOMPOK)",
             font=F(9, "bold"),
             text_color=C["text_muted"],
         ).pack(anchor="w", padx=20, pady=(0, 6))
@@ -90,7 +90,7 @@ class Sidebar(ctk.CTkFrame):
         sf.pack(fill="both", expand=True, padx=12, pady=(0, 8))
 
         metric_defs = [
-            # (key,        label,                    color,              icon)
+            # (key,        label,                    color,           icon)
             ("n",         "Jumlah Data (n)",         C["accent"],        "⬡"),
             ("k",         "Jumlah Kelas (k)",        C["accent"],        "⬡"),
             ("c",         "Lebar Kelas (c)",         C["accent"],        "⬡"),
@@ -122,24 +122,26 @@ class Sidebar(ctk.CTkFrame):
         self._file_lbl.configure(text=text)
 
     def update_stats(self, stats: dict) -> None:
+        """Memetakan hasil kalkulasi dari statistics.py ke UI sidebar."""
         mapping = {
             "n":        str(stats["n"]),
             "k":        str(stats["k"]),
-            "c":        str(stats["c"]),
-            "mean":     f"{stats['mean']:.4f}",
-            "median":   f"{stats['median']:.4f}",
-            "modus":    f"{stats['modus']:.4f}",
-            "std_dev":  f"{stats['std_dev']:.4f}",
-            "variance": f"{stats['variance']:.4f}",
-            "cv":       f"{stats['cv']:.2f}%",
-            "q1":       f"{stats['q1']:.4f}",
-            "q3":       f"{stats['q3']:.4f}",
-            "iqr":      f"{stats['iqr']:.4f}",
-            "skewness": f"{stats['skewness']:.4f}",
-            "kurtosis": f"{stats['kurtosis']:.4f}",
+            "c":        f"{stats['c']:.4f}",
+            "mean":     f"{stats['mean_grouped']:.4f}",
+            "median":   f"{stats['median_grouped']:.4f}",
+            "modus":    f"{stats['modus_grouped']:.4f}",
+            "std_dev":  f"{stats['std_dev_grouped']:.4f}",
+            "variance": f"{stats['variance_grouped']:.4f}",
+            "cv":       f"{stats['cv']:.2f}%",          # UBAH dari cv_grouped ke cv
+            "q1":       f"{stats['q1_grouped']:.4f}",
+            "q3":       f"{stats['q3_grouped']:.4f}",
+            "iqr":      f"{stats['iqr_grouped']:.4f}",
+            "skewness": f"{stats['skewness_raw']:.4f}",  # UBAH dari skewness_grouped ke skewness_raw
+            "kurtosis": f"{stats['kurtosis_raw']:.4f}",  # UBAH dari kurtosis_grouped ke kurtosis_raw
         }
         for key, val in mapping.items():
-            self._metrics[key].set_value(val)
+            if key in self._metrics:
+                self._metrics[key].set_value(val)
 
     def update_timestamp(self, ts: str) -> None:
         self._ts_lbl.configure(text=f"Dianalisis: {ts}")
