@@ -69,7 +69,7 @@ class StatistikApp(ctk.CTk):
         self.tab_dist = TabDistribusi(self.tabs)
         self.tab_grafik = TabGrafik(self.tabs)
         self.tab_boxplot = TabBoxplot(self.tabs)
-        self.tab_interp = TabInterpretasi(self.tabs.tab(TabInterpretasi.TAB_NAME))
+        self.tab_interp = TabInterpretasi(self.tabs)
         self.tab_laporan = TabLaporan(self.tabs)
 
         # State Data
