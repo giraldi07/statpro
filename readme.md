@@ -1,3 +1,8 @@
+# StatPro — Kalkulator Statistik Deskriptif Pro
+
+## Struktur Proyek
+
+```
 StatPro/
 ├── main.py                  ← Entry point, jalankan ini
 ├── README.md
@@ -26,3 +31,20 @@ StatPro/
 └── utils/
     ├── __init__.py
     └── file_reader.py       ← Baca Excel/CSV dengan deteksi encoding
+```
+
+## Instalasi
+
+```bash
+pip install -r requirements.txt
+```
+
+## Menjalankan
+
+```bash
+python main.py
+```
+
+## Dependensi
+
+Lihat `requirements.txt`
