@@ -238,7 +238,7 @@ class TabLaporan:
 
         # Footer
         story.append(Spacer(1, 30))
-        story.append(Paragraph("<i>Laporan ini dihasilkan secara otomatis oleh StatPro System.</i>", body_style))
+        story.append(Paragraph("<i>Laporan ini dihasilkan secara otomatis oleh StatPro System by Giraldi Prama Yudistira.S.Ikom.</i>", body_style))
 
         doc.build(story)
 
